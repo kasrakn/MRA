@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 
 // Default values of options used in the code
@@ -46,6 +47,8 @@ long long bufferSize(FILE *fp){
 
 int main(int argc, char** argv)
 {
+    clock_t beginTime = clock();
+
     int minPattern            = DEFAULT_MIN_CORE;
     int maxPattern            = DEFAULT_MAX_CORE;
     int threshold             = DEFAULT_THRESHOLD;
@@ -56,15 +59,17 @@ int main(int argc, char** argv)
     int patternSize3minRepeat = DEFAULT_CORESIZE_3;
     int patternSize4minRepeat = DEFAULT_CORESIZE_4;
 
+
     char* inputFilePath  = ""; 
     char* outputFilePath = "";
 
+    int dot2dot       = 0;
     int sameThreshold = 0;
-    int isFasta = 0;
+    int isFasta       = 0;
     int opt;
 
     /* This while loop is responsible for handling the command line input arguments. */
-    while((opt = getopt(argc, argv, ":i:o:t:m:M:l:L:1:2:3:4:5:hTF")) != -1) 
+    while((opt = getopt(argc, argv, ":i:o:t:m:M:l:L:1:2:3:4:5:hTFD")) != -1) 
     { 
         switch(opt) 
         { 
@@ -95,6 +100,9 @@ int main(int argc, char** argv)
             case 'L':
             	maxTrLength = atoi(optarg);
               break;
+            case 'D':
+                dot2dot = 1;
+                break;
             case '1':
                 patternSize1minRepeat = atoi(optarg);
                 break;
@@ -121,6 +129,7 @@ int main(int argc, char** argv)
                     "\n\t-t\t Minimum number of repeats which defines if a tandem repeats is appropriate or not (default = 2)"
                     "\n\t-T\t Sets the threshold of all core size equal to threshold value (see -t flag discription)"
                     "\n\t-F\t This flag should be used just for FASTA type input files"
+                    "\n\t-D\t This flag should be used only for experience 4"
                     "\n\t-i\t input file path"
                     "\n\t-o\t output file path"
                     "\n\t-1\t Minimum number of repeats for core size 1"
@@ -143,7 +152,6 @@ int main(int argc, char** argv)
         patternSize3minRepeat = threshold;
         patternSize4minRepeat = threshold;
     }
-    
 
     int len = maxPattern - minPattern + 1;
 
@@ -304,26 +312,36 @@ int main(int argc, char** argv)
             FILE *fp2 = fopen(outputFilePath, "w");
 
             if (fp2 != NULL){
-                fprintf(fp2, "Pattern");
-                fprintf(fp2, "\t   Start location");
-                fprintf(fp2, "\t   Number of repeats\n");
+                if (dot2dot) {
+                    fprintf(fp2, "Start");
+                    fprintf(fp2, "\tEnd\n");
+                } else {
+                    fprintf(fp2, "Pattern");
+                    fprintf(fp2, "\t   Start location");
+                    fprintf(fp2, "\t   Number of repeats\n");
+                }
 
                 for (long long i = 0; i < counter; i++){
                     int patternsize         = table[i].patternSize;
                     long int repeats        = table[i].repeates;
                     long long firstLocation = table[i].firstLocation;
 
-                    for(long long j = firstLocation + seenMarkers; j < firstLocation + seenMarkers + patternsize; j++){
-                        fputc(genome[j], fp2);
+                    if (dot2dot) {
+                        fprintf(fp2, "%lld", firstLocation);
+                        fprintf(fp2, "\t%lld", firstLocation + patternsize * repeats);
+                        fputs("\n", fp2);
+                    } else {
+                        for(long long j = firstLocation + seenMarkers; j < firstLocation + seenMarkers + patternsize; j++){
+                            fputc(genome[j], fp2);
+                        }
+
+                        for (int i = 0; i < (patternsize / 12); i++) fprintf(fp2, "  ");
+                        fprintf(fp2, "\t\t%lld", firstLocation);
+
+                        fprintf(fp2, "\t\t\t%ld", repeats);
+                        fputs("\n", fp2);
                     }
-
-                    for (int i = 0; i < (patternsize / 12); i++) fprintf(fp2, " ");
-                    fprintf(fp2, "\t\t%lld", firstLocation);
-
-                    fprintf(fp2, "\t\t\t%ld", repeats);
-                    fputs("\n", fp2);
                 }
-                fprintf(fp2, "\ncounter = %ld", counter);
             }
             fclose(fp2);
             // End of saving in file
@@ -331,6 +349,13 @@ int main(int argc, char** argv)
             fclose(fp);
             free(genome);
         }
+
+        clock_t endTime = clock();
+        double time_spent = 0.0;
+        time_spent += (double)(endTime - beginTime) / CLOCKS_PER_SEC;
+
+        printf("\nThe execution time: %f seconds\n", time_spent);
+        printf("Number of detected tandem repeats: %ld\n", counter);
     }
     
     return 0;
