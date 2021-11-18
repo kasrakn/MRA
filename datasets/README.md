@@ -11,10 +11,10 @@ The math formula presented in the Dot2dot paper for calculating the precision an
 \sigma_P(T, R)=\frac{1}{n} \left({\sum_{i=1}^{n} }{\frac{\sum_{x \in R(t_i)} jac(x, t_i)}{|R(t_i)|}} \right)
 $$ --> 
 
-<div align="center"><img style="background: white; padding: 10px;" src="https://render.githubusercontent.com/render/math?math=%5Csigma_P(T%2C%20R)%3D%5Cfrac%7B1%7D%7Bn%7D%20%5Cleft(%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%20%7D%7B%5Cfrac%7B%5Csum_%7Bx%20%5Cin%20R(t_i)%7D%20jac(x%2C%20t_i)%7D%7B%7CR(t_i)%7C%7D%7D%20%5Cright)"></div>
+<div align="center"><img style="background-color: white; padding: 10px;" src="https://render.githubusercontent.com/render/math?math=%5Csigma_P(T%2C%20R)%3D%5Cfrac%7B1%7D%7Bn%7D%20%5Cleft(%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%20%7D%7B%5Cfrac%7B%5Csum_%7Bx%20%5Cin%20R(t_i)%7D%20jac(x%2C%20t_i)%7D%7B%7CR(t_i)%7C%7D%7D%20%5Cright)"></div>
 
 <!-- $$
 \sigma_R(T, R)=\frac{1}{n} \left({\sum_{i=1}^{n}\textstyle_{x\in R(t_i)} \max jac(x, t_i)} \right)
 $$ --> 
 
-<div align="center"><img style="background: white; padding: 10px; margin-top: 20px" src="https://render.githubusercontent.com/render/math?math=%5Csigma_R(T%2C%20R)%3D%5Cfrac%7B1%7D%7Bn%7D%20%5Cleft(%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%5Ctextstyle_%7Bx%5Cin%20R(t_i)%7D%20%5Cmax%20jac(x%2C%20t_i)%7D%20%5Cright)"></div>
+<div align="center"><img style="background-color: white; padding: 10px; margin-top: 20px" src="https://render.githubusercontent.com/render/math?math=%5Csigma_R(T%2C%20R)%3D%5Cfrac%7B1%7D%7Bn%7D%20%5Cleft(%7B%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%5Ctextstyle_%7Bx%5Cin%20R(t_i)%7D%20%5Cmax%20jac(x%2C%20t_i)%7D%20%5Cright)"></div>
