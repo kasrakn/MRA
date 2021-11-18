@@ -21,7 +21,7 @@ Other flags are used to specify the properties of the tandem repeats. If not spe
 
 <br>
 
-| Flag | Defenition                                                                                                  | Default |
+| Flag | Definition                                                                                                  | Default |
 |------|-------------------------------------------------------------------------------------------------------------|---------|
 |  -m  | Minimum size of a core                                                                                      |    1    |
 |  -M  | Maximum size of a core                                                                                      |   100   |
