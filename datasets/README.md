@@ -7,10 +7,6 @@ For example, to calculate the precision and recall for the Promoters dataset, ru
 
 The math formula presented in the Dot2dot paper for calculating the precision and recall values:
 <br><br>
-$$
-\sigma_P(T, R)=\frac{1}{n} \left({\sum_{i=1}^{n} }{\frac{\sum_{x \in R(t_i)} jac(x, t_i)}{|R(t_i)|}} \right)
-$$
+<img src="https://render.githubusercontent.com/render/math?math=\sigma_P(T, R)=\frac{1}{n} \left({\sum_{i=1}^{n} }{\frac{\sum_{x \in R(t_i)} jac(x, t_i)}{|R(t_i)|}} \right)">
 
-$$
-\sigma_R(T, R)=\frac{1}{n} \left({\sum_{i=1}^{n}\mathop{}_{\mkern-5mu x\in R(t_i)} \max jac(x, t_i) } \right)
-$$
+<img src="https://render.githubusercontent.com/render/math?math=\sigma_R(T, R)=\frac{1}{n} \left({\sum_{i=1}^{n}\mathop{}_{\mkern-5mu x\in R(t_i)} \max jac(x, t_i) } \right)">
