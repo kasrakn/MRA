@@ -1,5 +1,5 @@
 # Precision-Recall experiment datasets
-## How to calculate the precision and recall value?
+## How to calculate the precision and recall values?
 
 Well, this is almost a lengthy process. To calculate the precision and recall values of a specific dataset, you should first run the Python code for each chromosome with its related dataset. The precision and recall of each chromosome are equal to the average value of the precision and recall of each tandem repeat (rows in the output CSV file). To calculate the precision and recall values for a specific dataset, you need to calculate the average precision and recall of chromosomes.
 
