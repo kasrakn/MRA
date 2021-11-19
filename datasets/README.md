@@ -6,7 +6,7 @@ Well, this is almost a lengthy process. To calculate the precision and recall va
 
 For example, to calculate the precision and recall for the Promoters dataset, run the [Python code](https://github.com/kasrakn/MPA/tree/main/src/Dot2dot%20Pecision-Recall%20Experiment) for chromosomes 1,2, ...X, Y with the presented datasets in this directory, and then calculate the average precision and recall values for each chromosome. In the end, calculate the average value of that average values which got in the previous step.
 
-The math formula presented in the Dot2dot paper (Genovese et al.2019, https://academic.oup.com/bioinformatics/article/35/6/914/5085378) for calculating the precision and recall values:
+The math formula presented in the [Dot2dot paper](https://academic.oup.com/bioinformatics/article/35/6/914/5085378) for calculating the precision and recall values:
 <br><br>
 <!-- $$
 \sigma_P(T, R)=\frac{1}{n} \left({\sum_{i=1}^{n} }{\frac{\sum_{x \in R(t_i)} jac(x, t_i)}{|R(t_i)|}} \right)
