@@ -1,9 +1,24 @@
+/**
+ * @file mpa.c
+ * @author Kasra Korminejad (korminejad.kasra@gmail.com)
+ * @brief 
+ * @version 0.2
+ * @date 2022-07-05
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+
+#include "inexact.h"  
+#include "utils.h"     
 
 
 // Default values of options used in the code
@@ -17,13 +32,16 @@
 #define DEFAULT_MAX_TR 50
 #define DEFAULT_THRESHOLD  2
 #define DEFAULT_TABLE_SIZE 10000000
+#define DEFAULT_BS_TR_RATIO 10  // len(bluestring) / len(tandemRepeat) must be <= DEFAULT_BS_TR_RATIO
 
 long int counter = 0;
 
 struct TandemRepeat 
 {
     int patternSize;
+    int inexact;
     long int firstLocation;
+    long int endLocation;
     long int repeates;
 };
 
@@ -36,7 +54,7 @@ struct Args
 struct TandemRepeat table[DEFAULT_TABLE_SIZE];
 
 /* Calculate the length of a text file */
-long long bufferSize(FILE *fp){
+long long getGenomeSize(FILE *fp){
     size_t pos = ftell(fp);      // Current position
     fseek(fp, 0, SEEK_END);      // Go to end
     size_t length = ftell(fp);   // read the position which is the size
@@ -54,6 +72,7 @@ int main(int argc, char** argv)
     int threshold             = DEFAULT_THRESHOLD;
     int minTrLength	          = DEFAULT_MIN_TR;
     int maxTrLength	          = DEFAULT_MAX_TR;
+    int maxBsTrRatio          = DEFAULT_BS_TR_RATIO;
     int patternSize1minRepeat = DEFAULT_CORESIZE_1;
     int patternSize2minRepeat = DEFAULT_CORESIZE_2;
     int patternSize3minRepeat = DEFAULT_CORESIZE_3;
@@ -66,10 +85,13 @@ int main(int argc, char** argv)
     int dot2dot       = 0;
     int sameThreshold = 0;
     int isFasta       = 0;
+    int inexact       = 0;
+    int charPerAlign  = 1;
     int opt;
 
+    // TODO: sort the flags aphabetically.
     /* This while loop is responsible for handling the command line input arguments. */
-    while((opt = getopt(argc, argv, ":i:o:t:m:M:l:L:1:2:3:4:5:hTFD")) != -1) 
+    while((opt = getopt(argc, argv, ":i:o:t:m:e:M:l:L:R:1:2:3:4:5:hTFDI")) != -1) 
     { 
         switch(opt) 
         { 
@@ -85,6 +107,9 @@ int main(int argc, char** argv)
             case 'm': 
                 minPattern = atoi(optarg); 
                 break;
+            case 'e':
+                charPerAlign = atoi(optarg);
+                break;
             case 'M':
                 maxPattern = atoi(optarg);
                 break;
@@ -96,12 +121,18 @@ int main(int argc, char** argv)
                 break;
             case 'l':
             	minTrLength = atoi(optarg);
-              break;
+                break;
             case 'L':
             	maxTrLength = atoi(optarg);
-              break;
+                break;
+            case 'R':
+                maxBsTrRatio = atoi(optarg);
+                break;
             case 'D':
                 dot2dot = 1;
+                break;
+            case 'I':
+                inexact = 1;
                 break;
             case '1':
                 patternSize1minRepeat = atoi(optarg);
@@ -119,32 +150,14 @@ int main(int argc, char** argv)
                 printf("Unknown option: %c\n", optopt);
                 break; 
             case 'h':
-                printf(
-                    "DESCRIPTION:\n\tMPA is a software which finds all tandem repeats in a genome sequence.\n\n"
-                    "PARAMETERS:"
-                    "\n\t-m\t Minimum size of a core (default = 1)"
-                    "\n\t-M\t Maximum size of a core (default = 100)"
-                    "\n\t-l\t Minimum length of a tandem repeat (default = 8)"
-                    "\n\t-L\t Maximum length of a tandem repeat (default = 50)"
-                    "\n\t-t\t Minimum number of repeats which defines if a tandem repeats is appropriate or not (default = 2)"
-                    "\n\t-T\t Sets the threshold of all core size equal to threshold value (see -t flag discription)"
-                    "\n\t-F\t This flag should be used just for FASTA type input files"
-                    "\n\t-D\t This flag should be used only for experience 4"
-                    "\n\t-i\t input file path"
-                    "\n\t-o\t output file path"
-                    "\n\t-1\t Minimum number of repeats for core size 1"
-                    "\n\t-2\t Minimum number of repeats for core size 2"
-                    "\n\t-3\t Minimum number of repeats for core size 3"
-                    "\n\t-4\t Minimum number of repeats for core size 4"
-                );
-                exit(0);
+                help();
                 break;
         } 
     } 
 
-    /* 
-    This if statement ignores the pre-defined values for little size patterns
-    and just set them to the value of the threshold variable
+    /**
+    * This if statement ignores the pre-defined values for little size patterns
+    * and just set them to the value of the threshold variable
     */
     if (sameThreshold == 1) {
         patternSize1minRepeat = threshold;
@@ -196,8 +209,12 @@ int main(int argc, char** argv)
         printf("\nERROR: No such a genome sequence file in %s\n", inputFilePath);
 
     else{
-        long long n = bufferSize(fp);
-        char* genome = (char*) malloc(sizeof(char) * n);
+        long long genomeSize = getGenomeSize(fp);
+        int endingTrSize = endingStringSize(minPattern, threshold, minTrLength);
+        long long bufferSize =  genomeSize + endingTrSize + 1;
+
+        char* genome = (char*) malloc(sizeof(char) * bufferSize);
+
         int lastAddedLoc = 0;
         int seenMarkers = 0;
 
@@ -221,22 +238,27 @@ int main(int argc, char** argv)
                 }
             }
         } else {
-            fgets(genome, n, (FILE*)fp);
+            fgets(genome, genomeSize, (FILE*)fp);
         }
+
+        for (int i = 0; i < endingTrSize; i++) {
+            genome[genomeSize + i - 1] = '*';
+        }
+        genome[bufferSize] = '\0';
 
         // Start of processing
         long long lastPlace = -1;
 
-        while (f[0] < n){
+        while (f[0] < bufferSize){
             int firstOneFound = 0;
-            /* 
-            The '>' is added to the genome array for separating probable tandem repeats 
-            in end of previous region and in start of the next one 
+            /**
+            * The '>' is added to the genome array for separating probable tandem repeats 
+            * in end of previous region and in start of the next one 
             */
             if (genome[fb] == '>' || toascii(genome[fb]) == 10) seenMarkers++;
 
             for(int i = minPattern; i <= maxPattern; i++){    
-                if (f[i - minPattern] == n || firstOneFound) continue;
+                if (f[i - minPattern] == bufferSize || firstOneFound) continue;
 
                 int ps = i;  // ps stards for pattern size
 
@@ -254,9 +276,10 @@ int main(int argc, char** argv)
                     } else;
                 } else {
                     rc[i - minPattern]++;
-                    /* 
-                    Store the Microsatellited in the table If there is a detected tandem repeat 
-                    in which the repeat count is greater than the specified threshold
+
+                    /**
+                    * Store the Microsatellited in the table If there is a detected tandem repeat 
+                    * in which the repeat count is greater than the specified threshold
                     */
                     if(rc[i - minPattern] >= threshold){
                         // This if statement checks for minimum repeats of pattern size 1 and 2
@@ -277,19 +300,111 @@ int main(int argc, char** argv)
                                 
                                 struct TandemRepeat tr;
                                 tr.firstLocation = fl[i - minPattern] - seenMarkers;
+                                tr.endLocation   = (fl[i - minPattern] - seenMarkers) + (rc[i - minPattern] * ps);
                                 tr.repeates      = rc[i - minPattern];
-                                tr.patternSize      = ps;
+                                tr.patternSize   = ps;
+                                tr.inexact = 0;
 
                                 /**
                                  *  This "if" statement checks for atomicity of the Microsatellite.
                                  * Because tandem repeat with larger pattern sizes are found sooner 
-                                 * so if a tandem repeat with the same start point will be found, 
+                                 * so if a tandem repeat with the same start location will be found, 
                                  * it will be replaced with the previous one in the table.
                                 */
                                 if(fl[i - minPattern] == lastPlace) 
                                     table[counter - 1] = tr;
                                 else {
                                     lastPlace = fl[i - minPattern];
+
+                                    /**
+                                    * Checking Inexactness
+                                    */
+
+                                   if (inexact) {
+                                       if (counter >= 1) {
+                                            struct TandemRepeat core1 = table[counter - 2];
+                                            struct TandemRepeat core2 = table[counter - 1];
+
+                                            /**
+                                             * calculate the number of required shifts to be identical cores;
+                                            */
+
+                                            char core1String[core1.patternSize + 1];
+                                            char core2String[core2.patternSize + 1];
+                                            core1String[0] = '\0';    
+                                            core2String[0] = '\0';   
+
+
+                                            strncpy(core1String, &genome[core1.firstLocation], core1.patternSize);
+                                            strncpy(core2String, &genome[core2.firstLocation], core2.patternSize); 
+
+                                            core1String[core1.patternSize] = '\0';
+                                            core2String[core2.patternSize] = '\0';
+
+                                            int shiftCount = shiftCounter(core1String, core2String);
+
+
+                                            // If the two TRs are compatible and there is a potential to make a larger TR.
+                                            if (shiftCount >= 0) {
+
+                                                // It is compatible -> processing the blue string
+                                                // ** bs stands for blue string, which has named in the paper;
+                                                int bsFirstLocation = core1.firstLocation + (core1.patternSize * core1.repeates);
+                                                int bsLastLocation  = core2.firstLocation - 1;
+                                                int bsLength        = bsLastLocation - bsFirstLocation + 1;
+
+                                                // When two TRs are overlapping then the size of the bluestring is 0.
+                                                if (bsLength < 0) bsLength = 0;
+
+                                                // The case of having two TRs with a very long bluestring between them is not acceptable.
+                                                if (bsLength / (core1.patternSize * core1.repeates) <= maxBsTrRatio) {
+                                                    // char blueString[bsLastLocation - bsFirstLocation + 2];
+                                                    char blueString[bsLength + 1];
+                                                    blueString[0] = '\0';                                                
+
+                                                    strncpy(blueString, &genome[bsFirstLocation], bsLength);
+                                                    // blueString[bsLastLocation - bsFirstLocation + 1] = '\0';
+                                                    blueString[bsLength] = '\0';
+
+                                                    // Initilize a empty string for storing the new substring.
+                                                    char newSubstring[bsLength * 2 + core1.patternSize]; // TODO: find a fewer value for the size of the array.
+                                                    newSubstring[0] = '\0';
+
+                                                    if (bsLength > 0){
+
+                                                        BsCorrector(newSubstring, blueString, core1String, core2String);
+                                                    } else {
+
+                                                        BsCorrector(newSubstring, blueString, core2String, core1String);
+                                                    }
+
+                                                    int editDistance = levenshtein(newSubstring, blueString);
+                                                    
+                                                    // TODO: Edit this to use 1 change per x character
+                                                    int desiredEditDistance = 0;
+                                                    if (strlen(blueString) > 0)
+                                                        desiredEditDistance = bsLength / charPerAlign;
+
+                                                    if (bsLength <= charPerAlign || editDistance <= desiredEditDistance) {
+                                                        // The two TRs can join together and make a larger eact TR;
+
+                                                        struct TandemRepeat inexactTR;
+                                                        inexactTR.firstLocation = core1.firstLocation;
+                                                        inexactTR.endLocation   = core2.endLocation;
+                                                        inexactTR.patternSize   = core1.patternSize;
+                                                        inexactTR.repeates      = (inexactTR.endLocation - inexactTR.firstLocation) / core1.patternSize;
+                                                        inexactTR.inexact = 1;
+
+                                                        table[counter - 2] = inexactTR;
+                                                        counter--;
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+                                    } 
+
                                     table[counter] = tr;
                                     counter++; 
                                 }
@@ -312,33 +427,35 @@ int main(int argc, char** argv)
             FILE *fp2 = fopen(outputFilePath, "w");
 
             if (fp2 != NULL){
-                if (dot2dot) {
-                    fprintf(fp2, "Start");
-                    fprintf(fp2, "\tEnd\n");
-                } else {
+                if (!dot2dot) {
                     fprintf(fp2, "Pattern");
-                    fprintf(fp2, "\t   Start location");
-                    fprintf(fp2, "\t   Number of repeats\n");
+                    fprintf(fp2, ",Start location");
+                    fprintf(fp2, ",End location");
+                    fprintf(fp2, ",Number of repeats");
+                    fprintf(fp2, ",Inexact\n");
                 }
 
-                for (long long i = 0; i < counter; i++){
+                for (long long i = 0; i < counter - 1; i++){
                     int patternsize         = table[i].patternSize;
                     long int repeats        = table[i].repeates;
                     long long firstLocation = table[i].firstLocation;
+                    long long endLocation   = table[i].endLocation;
+                    int inexact             = table[i].inexact;
 
                     if (dot2dot) {
-                        fprintf(fp2, "%lld", firstLocation);
-                        fprintf(fp2, "\t%lld", firstLocation + patternsize * repeats);
+                        fprintf(fp2, "%lld,", firstLocation);
+                        fprintf(fp2, "%lld", endLocation);
                         fputs("\n", fp2);
                     } else {
                         for(long long j = firstLocation + seenMarkers; j < firstLocation + seenMarkers + patternsize; j++){
                             fputc(genome[j], fp2);
                         }
 
-                        for (int i = 0; i < (patternsize / 12); i++) fprintf(fp2, "  ");
-                        fprintf(fp2, "\t\t%lld", firstLocation);
-
-                        fprintf(fp2, "\t\t\t%ld", repeats);
+                        // for (int i = 0; i < (patternsize / 12); i++) fprintf(fp2, "  ");
+                        fprintf(fp2, ",%lld", firstLocation);
+                        fprintf(fp2, ",%lld", endLocation);
+                        fprintf(fp2, ",%ld", repeats);
+                        fprintf(fp2, ",%d", inexact);
                         fputs("\n", fp2);
                     }
                 }
@@ -349,13 +466,12 @@ int main(int argc, char** argv)
             fclose(fp);
             free(genome);
         }
-
         clock_t endTime = clock();
         double time_spent = 0.0;
         time_spent += (double)(endTime - beginTime) / CLOCKS_PER_SEC;
 
         printf("\nThe execution time: %f seconds\n", time_spent);
-        printf("Number of detected tandem repeats: %ld\n", counter);
+        printf("Number of detected tandem repeats: %ld\n", counter - 1);
     }
     
     return 0;
