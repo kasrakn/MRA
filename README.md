@@ -1,5 +1,5 @@
 # MPA: A Novel Millipede Algorithm to Discover all Tandem Repeats in One Scan of DNA 
-MPA is an efficient software written in C language to find perfect tandem repeats in a genome sequence.
+MPA is an efficient software written in C language to find both **exact** and **inexact** tandem repeats in a genome sequence.
 <br>
 <br>
 ## **Compile the source code**:
