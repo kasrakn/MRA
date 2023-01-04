@@ -1,5 +1,5 @@
-# MPA: A Novel Millipede Algorithm to Discover all Tandem Repeats in One Scan of DNA 
-MPA is an efficient software written in C language to find both **exact** and **inexact** tandem repeats in a genome sequence.
+# A Novel Multi-head Algorithm to Discover all Tandem Repeats in One Scan of DNA Sequences
+MRA is an efficient software written in C language to find both **exact** and **inexact** tandem repeats in a genome sequence.
 <br>
 <br>
 ## **Compile the source code**:
@@ -38,6 +38,6 @@ Other flags are used to specify the properties of the tandem repeats. If not spe
 
 #### **Example**:
 ```
-./mpa.bin -m 8 -M 100 -l 20 -L 200 -t 5 -2 4 -3 4 -F -i inputSeq.fa -o output-results.txt
+./mra.bin -m 8 -M 100 -l 20 -L 200 -t 5 -2 4 -3 4 -F -i -I -e 6 inputSeq.fa -o output-results.txt
 ```
 
