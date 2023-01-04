@@ -1,4 +1,4 @@
-# A Novel Multi-head Algorithm to Discover all Tandem Repeats in One Scan of DNA Sequences
+# MRA, A Novel Multi-head Algorithm to Discover all Tandem Repeats in One Scan of DNA Sequences
 MRA is an efficient software written in C language to find both **exact** and **inexact** tandem repeats in a genome sequence.
 <br>
 <br>
