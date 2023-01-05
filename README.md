@@ -1,14 +1,14 @@
 # MRA, A Novel Multi-head Algorithm to Discover all Tandem Repeats in One Scan of DNA Sequences
-MRA is an efficient software written in C language to find both **exact** and **inexact** tandem repeats in a genome sequence.
+MRA is an efficient software for finding repetitive patterns (tandem repeats) in genome sequences in both *exact* and *inexact* modes.
 <br>
 <br>
 ## **Compile the source code**:
-To compile this code, you can use the GCC compiler. Also, you can compile it with any other available compilers for the C language. To compile it with GCC compiler, use the command below:
+In order to run MRA software, the 'MRA' executable file is provided on the root of the directory and in the releases section of this repository. However, if you want to compile the source code, you can use the command ```make```, which generates the 'MRA' executable file in the root of the directory for you.
+### **Compile manually**: Users are also capable of compiling this code using any C language compiler. Here we have described the command needed to compile the code using the GCC compiler with optimization level 3. This optimization helps the program to run much faster, while at first time, it might take longer to compile compared to the other levels. You can read more about GCC optimizations at [GCC Optimization Options]('https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html').
 
 ```
-gcc -O3 -o -w tandem tandem.c
+gcc -O3 -o -w MRA src/mra.c
 ```
-As can be seen in the command above, optimization number 3 has been used. This option can help to run faster, especially in larger genome sequences. You can read more about GCC optizations [here]('https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html').
 
 <br>
 
