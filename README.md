@@ -1,4 +1,4 @@
-# MRA, A Novel Multi-head Algorithm to Discover all Tandem Repeats in One Scan of DNA Sequences
+# MRA - A Novel Multi-head Algorithm to Discover all Tandem Repeats in One Scan of DNA Sequences
 MRA is an efficient software for finding repetitive patterns (tandem repeats) in genome sequences in both *exact* and *inexact* modes.
 <br>
 <br>
