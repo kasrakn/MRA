@@ -29,7 +29,7 @@
 #define DEFAULT_MIN_CORE 1
 #define DEFAULT_MAX_CORE 100
 #define DEFAULT_MIN_TR 8
-#define DEFAULT_MAX_TR 50
+#define DEFAULT_MAX_TR -1
 #define DEFAULT_THRESHOLD  2
 #define DEFAULT_TABLE_SIZE 10000000
 #define DEFAULT_BS_TR_RATIO 10  // len(bluestring) / len(tandemRepeat) must be <= DEFAULT_BS_TR_RATIO
@@ -252,7 +252,7 @@ int main(int argc, char** argv)
         while (f[0] < bufferSize){
             int firstOneFound = 0;
             /**
-            * The '>' is added to the genome array for separating probable tandem repeats 
+            * The '>' is added to the genome array to separate probable tandem repeats 
             * in end of previous region and in start of the next one 
             */
             if (genome[fb] == '>' || toascii(genome[fb]) == 10) seenMarkers++;
@@ -278,8 +278,8 @@ int main(int argc, char** argv)
                     rc[i - minPattern]++;
 
                     /**
-                    * Store the Microsatellited in the table If there is a detected tandem repeat 
-                    * in which the repeat count is greater than the specified threshold
+                    * Store the tandem repeat in the table If there is a detected tandem repeat 
+                    * when the number of the repeats is greater than the specified threshold
                     */
                     if(rc[i - minPattern] >= threshold){
                         // This if statement checks for minimum repeats of pattern size 1 and 2
@@ -290,8 +290,9 @@ int main(int argc, char** argv)
                             !((ps == 4) && (rc[i - minPattern] < patternSize4minRepeat))
                         ) {
                             if (
+                                // Check whether the size of the TR satisfies the conditions or not
                                 (ps * rc[i - minPattern] >= minTrLength) &&
-                                (ps * rc[i - minPattern] <= maxTrLength)
+                                (maxTrLength < 0 || (ps * rc[i - minPattern] <= maxTrLength))
                             ) {
                                 int mlen = rc[i - minPattern] * ps;
 
@@ -300,7 +301,7 @@ int main(int argc, char** argv)
                                 
                                 struct TandemRepeat tr;
                                 tr.firstLocation = fl[i - minPattern] - seenMarkers;
-                                tr.endLocation   = (fl[i - minPattern] - seenMarkers) + (rc[i - minPattern] * ps);
+                                tr.endLocation   = (fl[i - minPattern] - seenMarkers) + (rc[i - minPattern] * ps) - 1;
                                 tr.repeates      = rc[i - minPattern];
                                 tr.patternSize   = ps;
                                 tr.inexact = 0;
@@ -308,105 +309,112 @@ int main(int argc, char** argv)
                                 /**
                                  *  This "if" statement checks for atomicity of the Microsatellite.
                                  * Because tandem repeat with larger pattern sizes are found sooner 
-                                 * so if a tandem repeat with the same start location will be found, 
-                                 * it will be replaced with the previous one in the table.
+                                 * so if a tandem repeat with the same start location is found, it
+                                 * replaces the previous one in the table.
                                 */
                                 if(fl[i - minPattern] == lastPlace) 
                                     table[counter - 1] = tr;
                                 else {
                                     lastPlace = fl[i - minPattern];
 
-                                    /**
-                                    * Checking Inexactness
-                                    */
+                                    // Ignoring the unnecessary TRs (Those overlap with prior TRs more than the size of the pattern of it)
+                                    struct TandemRepeat lastTr = table[counter - 1];
+                                    if ((lastTr.endLocation - (lastTr.patternSize - 1) < tr.firstLocation) || 
+                                        (lastTr.repeates < tr.repeates)
+                                    ) {
+                                        
+                                        // Checking for Inexact TRs
+                                        if (inexact) {
+                                            if (counter >= 1) {
+                                                    struct TandemRepeat core1 = table[counter - 2];
+                                                    struct TandemRepeat core2 = table[counter - 1];
 
-                                   if (inexact) {
-                                       if (counter >= 1) {
-                                            struct TandemRepeat core1 = table[counter - 2];
-                                            struct TandemRepeat core2 = table[counter - 1];
+                                                    /**
+                                                     * calculate the number of required shifts to be identical cores;
+                                                    */
 
-                                            /**
-                                             * calculate the number of required shifts to be identical cores;
-                                            */
-
-                                            char core1String[core1.patternSize + 1];
-                                            char core2String[core2.patternSize + 1];
-                                            core1String[0] = '\0';    
-                                            core2String[0] = '\0';   
-
-
-                                            strncpy(core1String, &genome[core1.firstLocation], core1.patternSize);
-                                            strncpy(core2String, &genome[core2.firstLocation], core2.patternSize); 
-
-                                            core1String[core1.patternSize] = '\0';
-                                            core2String[core2.patternSize] = '\0';
-
-                                            int shiftCount = shiftCounter(core1String, core2String);
+                                                    char core1String[core1.patternSize + 1];
+                                                    char core2String[core2.patternSize + 1];
+                                                    core1String[0] = '\0';    
+                                                    core2String[0] = '\0';   
 
 
-                                            // If the two TRs are compatible and there is a potential to make a larger TR.
-                                            if (shiftCount >= 0) {
+                                                    strncpy(core1String, &genome[core1.firstLocation + seenMarkers], core1.patternSize);
+                                                    strncpy(core2String, &genome[core2.firstLocation + seenMarkers], core2.patternSize); 
 
-                                                // It is compatible -> processing the blue string
-                                                // ** bs stands for blue string, which has named in the paper;
-                                                int bsFirstLocation = core1.firstLocation + (core1.patternSize * core1.repeates);
-                                                int bsLastLocation  = core2.firstLocation - 1;
-                                                int bsLength        = bsLastLocation - bsFirstLocation + 1;
+                                                    core1String[core1.patternSize] = '\0';
+                                                    core2String[core2.patternSize] = '\0';
 
-                                                // When two TRs are overlapping then the size of the bluestring is 0.
-                                                if (bsLength < 0) bsLength = 0;
+                                                    int shiftCount = shiftCounter(core1String, core2String);
 
-                                                // The case of having two TRs with a very long bluestring between them is not acceptable.
-                                                if (bsLength / (core1.patternSize * core1.repeates) <= maxBsTrRatio) {
-                                                    // char blueString[bsLastLocation - bsFirstLocation + 2];
-                                                    char blueString[bsLength + 1];
-                                                    blueString[0] = '\0';                                                
 
-                                                    strncpy(blueString, &genome[bsFirstLocation], bsLength);
-                                                    // blueString[bsLastLocation - bsFirstLocation + 1] = '\0';
-                                                    blueString[bsLength] = '\0';
+                                                    // If the two TRs are compatible and there is a potential to make a larger TR.
+                                                    if (shiftCount >= 0) {
 
-                                                    // Initilize a empty string for storing the new substring.
-                                                    char newSubstring[bsLength * 2 + core1.patternSize]; // TODO: find a fewer value for the size of the array.
-                                                    newSubstring[0] = '\0';
+                                                        // It is compatible -> processing the blue string
+                                                        // ** bs stands for blue string, which has named in the paper;
+                                                        int bsFirstLocation = core1.firstLocation + (core1.patternSize * core1.repeates);
+                                                        int bsLastLocation  = core2.firstLocation - 1;
+                                                        int bsLength        = bsLastLocation - bsFirstLocation + 1;
 
-                                                    if (bsLength > 0){
+                                                        // When two TRs are overlapping then the size of the bluestring is 0.
+                                                        if (bsLength < 0) bsLength = 0;
 
-                                                        BsCorrector(newSubstring, blueString, core1String, core2String);
-                                                    } else {
+                                                        // The case of having two TRs with a very long bluestring between them is not acceptable.
+                                                        if (bsLength / (core1.patternSize * core1.repeates) <= maxBsTrRatio) {
+                                                            // char blueString[bsLastLocation - bsFirstLocation + 2];
+                                                            char blueString[bsLength + 1];
+                                                            blueString[0] = '\0';                                                
 
-                                                        BsCorrector(newSubstring, blueString, core2String, core1String);
+                                                            strncpy(blueString, &genome[bsFirstLocation + seenMarkers], bsLength);
+                                                            // blueString[bsLastLocation - bsFirstLocation + 1] = '\0';
+                                                            blueString[bsLength] = '\0';
+
+                                                            // Initilize a empty string for storing the new substring.
+                                                            char newSubstring[bsLength * 2 + core1.patternSize]; // TODO: find a fewer value for the size of the array.
+                                                            newSubstring[0] = '\0';
+
+                                                            if (bsLength > 0){
+
+                                                                BsCorrector(newSubstring, blueString, core1String, core2String);
+                                                            } else {
+
+                                                                BsCorrector(newSubstring, blueString, core2String, core1String);
+                                                            }
+
+                                                            int editDistance = levenshtein(newSubstring, blueString);
+                                                            
+                                                            // TODO: Edit this to use 1 change per x character
+                                                            int desiredEditDistance = 0;
+                                                            if (strlen(blueString) > 0)
+                                                                desiredEditDistance = bsLength / charPerAlign;
+
+                                                            if (bsLength <= charPerAlign || editDistance <= desiredEditDistance) {
+                                                                // The two TRs can join together and make a larger eact TR;
+
+                                                                struct TandemRepeat inexactTR;
+                                                                inexactTR.firstLocation = core1.firstLocation;
+                                                                inexactTR.endLocation   = core2.endLocation;
+                                                                inexactTR.patternSize   = core1.patternSize;
+                                                                inexactTR.repeates      = (inexactTR.endLocation - inexactTR.firstLocation) / core1.patternSize;
+                                                                inexactTR.inexact = 1;
+
+                                                                table[counter - 2] = inexactTR;
+                                                                counter--;
+                                                            }
+
+                                                        }
+
                                                     }
-
-                                                    int editDistance = levenshtein(newSubstring, blueString);
-                                                    
-                                                    // TODO: Edit this to use 1 change per x character
-                                                    int desiredEditDistance = 0;
-                                                    if (strlen(blueString) > 0)
-                                                        desiredEditDistance = bsLength / charPerAlign;
-
-                                                    if (bsLength <= charPerAlign || editDistance <= desiredEditDistance) {
-                                                        // The two TRs can join together and make a larger eact TR;
-
-                                                        struct TandemRepeat inexactTR;
-                                                        inexactTR.firstLocation = core1.firstLocation;
-                                                        inexactTR.endLocation   = core2.endLocation;
-                                                        inexactTR.patternSize   = core1.patternSize;
-                                                        inexactTR.repeates      = (inexactTR.endLocation - inexactTR.firstLocation) / core1.patternSize;
-                                                        inexactTR.inexact = 1;
-
-                                                        table[counter - 2] = inexactTR;
-                                                        counter--;
-                                                    }
-
                                                 }
+                                            } 
 
-                                            }
+                                        if (genome[tr.firstLocation + seenMarkers] != 'N'){
+                                            table[counter] = tr;
+                                            counter++; 
                                         }
-                                    } 
+                                    }
 
-                                    table[counter] = tr;
-                                    counter++; 
                                 }
                             }
                         }
@@ -442,21 +450,22 @@ int main(int argc, char** argv)
                     long long endLocation   = table[i].endLocation;
                     int inexact             = table[i].inexact;
 
-                    if (dot2dot) {
+                    if (genome[firstLocation + seenMarkers] != 'N'){
+                        if (dot2dot) {
                         fprintf(fp2, "%lld,", firstLocation);
                         fprintf(fp2, "%lld", endLocation);
                         fputs("\n", fp2);
-                    } else {
-                        for(long long j = firstLocation + seenMarkers; j < firstLocation + seenMarkers + patternsize; j++){
-                            fputc(genome[j], fp2);
-                        }
+                        } else {
+                            for(long long j = firstLocation + seenMarkers; j < firstLocation + seenMarkers + patternsize; j++){
+                                fputc(genome[j], fp2);
+                            }
 
-                        // for (int i = 0; i < (patternsize / 12); i++) fprintf(fp2, "  ");
-                        fprintf(fp2, ",%lld", firstLocation);
-                        fprintf(fp2, ",%lld", endLocation);
-                        fprintf(fp2, ",%ld", repeats);
-                        fprintf(fp2, ",%d", inexact);
-                        fputs("\n", fp2);
+                            fprintf(fp2, ",%lld", firstLocation);
+                            fprintf(fp2, ",%lld", endLocation);
+                            fprintf(fp2, ",%ld", repeats);
+                            fprintf(fp2, ",%d", inexact);
+                            fputs("\n", fp2);
+                        }
                     }
                 }
             }
