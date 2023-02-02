@@ -4,7 +4,8 @@ MRA is an efficient software for finding repetitive patterns (tandem repeats) in
 <br>
 ## **Compile the source code**:
 In order to run MRA software, the 'MRA' executable file is provided on the root of the directory and in the releases section of this repository. However, if you want to compile the source code, you can use the command ```make```, which generates the 'MRA' executable file in the root of the directory for you.
-### **Compile manually**: Users are also capable of compiling this code using any C language compiler. Here we have described the command needed to compile the code using the GCC compiler with optimization level 3. This optimization helps the program to run much faster, while at first time, it might take longer to compile compared to the other levels. You can read more about GCC optimizations at [GCC Optimization Options]('https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html').
+### **Compile manually** 
+Users are also capable of compiling this code using any C language compiler. Here we have described the command needed to compile the code using the GCC compiler with optimization level 3. This optimization helps the program to run much faster, while at first time, it might take longer to compile compared to the other levels. You can read more about GCC optimizations at [GCC Optimization Options]('https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html').
 
 ```
 gcc -O3 -o -w MRA src/mra.c
