@@ -1,3 +1,4 @@
+import argparse
 
 chr1_len = 248956422
 chr2_len = 242193529
@@ -18,15 +19,15 @@ def sort_trs(line:str):
     return int(splited[3])
 
 
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--input", type=str, required=True, help="Path to the `directory` that contains the output file of the software")
+args = vars(ap.parse_args())
 
 if __name__ == "__main__":
-    exp = int(input("Which experiment? 6 or 100\t"))
-
-    sw_outupt_dir = f"../outputs/{exp}/"
+    sw_outupt_dir = args['input'] + f"{'/' if args['input'][-1] != '/' else ''}"
 
     for i in range(1, 6):
         print(f"Sequence: chromosome {i}")
-        print("experiment: tr-", exp)
 
         file_path = sw_outupt_dir + f"chr{i}.txt"
 

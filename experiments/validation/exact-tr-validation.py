@@ -1,10 +1,12 @@
-data_dir = './data'
-exp = '/100'
-chr = '/chr2'
+import argparse
 
-seq_dir = './datasets/seq'
-output_dir = './outputs'
 
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--input", type=str, required=True, help="Path to the output file of the program.")
+ap.add_argument("-s", "--seq", type=str, required=True, help="Path to the genome sequence file.")
+ap.add_argument("-o", "--output", type=str, required=True, help="Path the directory of the result file.")
+args = vars(ap.parse_args())
+experiment = 1  # default: microsatellite
 
 
 def pattern_validation(tr_pattern: str, start_loc: int, tr_repeat: int):
@@ -16,14 +18,16 @@ def repeat_validation(tr_pattern: str, start_loc: int, tr_repeat: int):
 
 
 if __name__ == "__main__":
-    outputFile = open(output_dir + exp + chr + '-result.csv', 'w')
+    experiment = int(input("Experiment number: 1: microsatellite , 2: satellite"))
+
+    outputFile = open(args['output'] + '/' + chr + '-result.csv', 'w')
     outputFile.write('pattern,start,end,repeat,inexact\n')
 
-    with open(seq_dir + chr + '.txt', 'r') as datasetFile:
+    with open(args['seq'], 'r') as datasetFile:
         global sequence 
         sequence = datasetFile.readline()
 
-        with open (data_dir + exp + chr + '.csv', 'r') as inpFile:
+        with open (args['input'], 'r') as inpFile:
             lines = inpFile.readlines()[1:]
 
             for line in lines:
@@ -39,11 +43,6 @@ if __name__ == "__main__":
                         f"{pattern},{start},{end},{repeat},{inexact}\n"
                     )
                     print(tr)
-
-                # if not repeat_validation(pattern, start, repeat):
-                #     outputFile.write(
-                #         f"repeat,{pattern},{start},{end},{repeat},{inexact}\n"
-                #     )
 
     outputFile.close()
 

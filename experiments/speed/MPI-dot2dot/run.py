@@ -2,11 +2,16 @@
 # from memory_profiler import profile, memory_usage
 import os
 import subprocess
+import argparse
 from time import sleep, time
 
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--input", type=str, required=True, help="Path to the genome sequence file.")
+ap.add_argument("-o", "--output", type=str, required=True, help="Path the directory of the result file.")
+args = vars(ap.parse_args())
 
 def run(chr):
-    cmd = f"mpirun -np 14  ./dot -c config.cfg  -s ../../datasets/full-sequence/fasta/chr{chr}.fa -o outputs/{chr}"
+    cmd = f"mpirun -np 14  ./dot -c config.cfg  -s {args['input']} -o {args['output']}/{chr}-output.txt"
     os.system(cmd)
 
 if __name__ == '__main__':

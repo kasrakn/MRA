@@ -1,3 +1,5 @@
+import argparse
+
 
 chr1_len = 248956422
 chr2_len = 242193529
@@ -14,10 +16,15 @@ chr_lengths = [
 ]
 
 
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--input", type=str, required=True, help="Path to the `directory` that contains the output file of the software")
+args = vars(ap.parse_args())
+
+
 if __name__ == "__main__":
     exp = int(input("Which experiment? 6 or 100\t"))
 
-    sw_outupt_dir = f"../term-outputs3/{exp}/"
+    sw_outupt_dir = args['input'] + f"{'/' if args['input'][-1] != '/' else ''}"
 
     for i in range(1, 6):
         print(f"Sequence: chromosome {i}")
@@ -34,16 +41,12 @@ if __name__ == "__main__":
 
             for ind, tr_line in enumerate(data_lines):
                 spl_line = tr_line.split()
-                # print(spl_line)
 
                 start_tr = int(spl_line[0])
                 end_tr = int(spl_line[2])
                 pattern_size = int(spl_line[5][1])
                 repeats = float(spl_line[6][1:-1])
                 tr_length = end_tr - start_tr + 1
-
-                # if pattern_size == 4 and repeats < 3:
-                #     continue
                 
                 try:
                     next_tr = data_lines[ind + 1]

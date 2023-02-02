@@ -2,11 +2,18 @@
 # from memory_profiler import profile, memory_usage
 import os
 import subprocess
+import argparse
 from time import sleep, time
 
 
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--input", type=str, required=True, help="Path to the genome sequence file.")
+ap.add_argument("-o", "--output", type=str, required=True, help="Path the directory of the result file.")
+args = vars(ap.parse_args())
+
+
 def run(chr):
-    cmd = f"PERF -m 1 -M 6 --format fasta -i ../../datasets/full-sequence/fasta/chr{chr}.fa -o outputs/6/chr{chr}-output.txt"
+    cmd = f"PERF -m 1 -M 6 --format fasta -i {args['input']} -o {args['output']}/{chr}-output.txt"
     os.system(cmd)
 
 if __name__ == '__main__':
