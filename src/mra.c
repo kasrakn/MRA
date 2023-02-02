@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     int sameThreshold = 0;
     int isFasta       = 0;
     int inexact       = 0;
-    int charPerAlign  = 1;
+    int charPerAlign  = 6;
     int opt;
 
     // TODO: sort the flags aphabetically.
