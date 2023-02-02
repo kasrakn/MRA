@@ -14,7 +14,6 @@ gcc -O3 -o -w MRA src/mra.c
 <br>
 
 ## **How to run the executable file?**
-<br>
 
 ### **Parameters**:
 Firstly, to run the program, you need to specify the path to the input and output files. This can be done by using -i and -o flags (These two flags are mandatory). If the input file is in the FASTA format, -F flag is also required. Not mentioning this flag when using a FASTA format input can cause some errors during the execution.\
