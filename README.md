@@ -23,21 +23,27 @@ Other flags are used to specify the properties of the tandem repeats. If not spe
 
 | Flag | Definition                                                                                                  | Default |
 |------|-------------------------------------------------------------------------------------------------------------|---------|
-|  -m  | Minimum size of a core                                                                                      |    1    |
-|  -M  | Maximum size of a core                                                                                      |   100   |
-|  -l  | Minimum length of a tandem repeat                                                                           |    8    |
-|  -L  | Maximum length of a tandem repeat                                                                           |    50   |
-|  -t  | Minimum number of repeats defines if a tandem repeat is acceptable or not                                   |    2    |
-|  -T  | Sets the threshold of all core size equal to threshold value (see -t flag description)                      |         |
-|  -F  | This flag should be used when the input sequence is in FASTA format                                         |         |
-|  -D  | This flag should be used only for experience 4. The output will contain only start start and end locations. |         |
 |  -1  | Minimum number of repeats for core size 1                                                                   |    6    |
 |  -2  | Minimum number of repeats for core size 2                                                                   |    3    |
 |  -3  | Minimum number of repeats for core size 3                                                                   |    2    |
 |  -4  | Minimum number of repeats for core size 4                                                                   |    2    |
+|  -D  | This flag should be used only for experience 4. The output will contain only start start and end locations. |         |
+|  -e  | Number of characters per align                                                                              |    6    |
+|  -F  | This flag should be used when the input sequence is in FASTA format                                         |         |
+|  -h  | Help - Guide for how to run the code                                                                        |         |
+|  -I  | This flag is to set the program to find inexact TRs as well as exacts ones                                  |         |
+|  -i  | Input file path                                                                                             |         |
+|  -L  | Maximum length of a tandem repeat                                                                           |    50   |
+|  -l  | Minimum length of a tandem repeat                                                                           |    8    |
+|  -M  | Maximum size of a pattern                                                                                   |   100   |
+|  -m  | Minimum size of a pattern                                                                                   |    1    |
+|  -o  | Output file path                                                                                            |         |
+|  -R  | The largest ratio of the length of inexact tandem repeat to its prior exact TR                              |    10   |
+|  -T  | Sets the threshold of all core size equal to threshold value (see -t flag description)                      |         |
+|  -t  | Minimum number of repeats defines if a tandem repeat is acceptable or not                                   |    2    |
 
 #### **Example**:
 ```
-./mra.bin -m 8 -M 100 -l 20 -L 200 -t 5 -2 4 -3 4 -F -i -I -e 6 inputSeq.fa -o output-results.txt
+./MRA -m 8 -M 100 -l 20 -L 200 -t 5 -2 4 -3 4 -F -i -I -e 6 inputSeq.fa -o output-results.txt
 ```
 
