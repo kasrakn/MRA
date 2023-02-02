@@ -1,0 +1,40 @@
+Which experiment? 6 or 100      6
+Sequence: chromosome 1
+experiment: tr- 6
+number of lines:  1782190
+Total tr lens :  10050019
+coverage = 4.036858707746049 %
+total double coverd area:  75482
+
+--
+Sequence: chromosome 2
+experiment: tr- 6
+number of lines:  1849226
+Total tr lens :  10225659
+coverage = 4.222102482349972 %
+total double coverd area:  71755
+
+--
+Sequence: chromosome 3
+experiment: tr- 6
+number of lines:  1507617
+Total tr lens :  8226593
+coverage = 4.148652164217152 %
+total double coverd area:  55728
+
+--
+Sequence: chromosome 4
+experiment: tr- 6
+number of lines:  1462524
+Total tr lens :  7997351
+coverage = 4.204384359545987 %
+total double coverd area:  54359
+
+--
+Sequence: chromosome 5
+experiment: tr- 6
+number of lines:  1388152
+Total tr lens :  7572512
+coverage = 4.171303636882405 %
+
+total double coverd area:  54394

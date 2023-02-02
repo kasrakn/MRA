@@ -1,0 +1,34 @@
+Sequence: chromosome 1
+experiment: tr- 6
+number of lines:  69951
+Total covered area:  2700
+Total tr lens :  1565899
+coverage = 0.6289851803863087 %
+
+Sequence: chromosome 2
+experiment: tr- 6
+number of lines:  66130
+Total covered area:  2470
+Total tr lens :  1495257
+coverage = 0.6173810696651602 %
+
+Sequence: chromosome 3
+experiment: tr- 6
+number of lines:  52730
+Total covered area:  1954
+Total tr lens :  1191276
+coverage = 0.6007577809647265 %
+
+Sequence: chromosome 4
+experiment: tr- 6
+number of lines:  48545
+Total covered area:  1704
+Total tr lens :  1104436
+coverage = 0.5806264404950505 %
+
+Sequence: chromosome 5
+experiment: tr- 6
+number of lines:  46971
+Total covered area:  1614
+Total tr lens :  1066082
+coverage = 0.5872492145030431 %

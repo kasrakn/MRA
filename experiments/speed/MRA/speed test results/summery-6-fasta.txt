@@ -1,0 +1,37 @@
+[PROCESS START]:        Running MRA on chromosome = 1
+
+The execution time: 9.779743 seconds
+Number of detected tandem repeats: 1782267
+[PROCESS END]:  Processing finished on chromosome 1 in 10.30066967010498 seconds
+
+
+==============================
+[PROCESS START]:        Running MRA on chromosome = 2
+
+The execution time: 9.355669 seconds
+Number of detected tandem repeats: 1849248
+[PROCESS END]:  Processing finished on chromosome 2 in 9.802940607070923 seconds
+
+
+==============================
+[PROCESS START]:        Running MRA on chromosome = 3
+
+The execution time: 7.628856 seconds
+Number of detected tandem repeats: 1507637
+[PROCESS END]:  Processing finished on chromosome 3 in 7.978064298629761 seconds
+
+
+==============================
+[PROCESS START]:        Running MRA on chromosome = 4
+
+The execution time: 7.393133 seconds
+Number of detected tandem repeats: 1462542
+[PROCESS END]:  Processing finished on chromosome 4 in 7.715427875518799 seconds
+
+
+==============================
+[PROCESS START]:        Running MRA on chromosome = 5
+
+The execution time: 7.071620 seconds
+Number of detected tandem repeats: 1388189
+[PROCESS END]:  Processing finished on chromosome 5 in 7.448370456695557 seconds

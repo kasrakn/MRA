@@ -1,0 +1,30 @@
+Sequence: chromosome 1
+experiment: tr- 6
+number of lines:  12
+Total tr lens :  0
+coverage = 0.0 %
+
+Sequence: chromosome 2
+experiment: tr- 6
+number of lines:  202935
+Total tr lens :  3311908
+coverage = 1.3674634552271625 %
+
+Sequence: chromosome 3
+experiment: tr- 6
+number of lines:  164194
+Total tr lens :  2663370
+coverage = 1.3431314414862916 %
+
+Sequence: chromosome 4
+experiment: tr- 6
+number of lines:  153444
+Total tr lens :  2494858
+coverage = 1.3116020485393456 %
+
+Sequence: chromosome 5
+experiment: tr- 6
+number of lines:  145810
+Total tr lens :  2373497
+coverage = 1.3074362468134058 %
+

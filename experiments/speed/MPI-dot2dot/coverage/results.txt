@@ -1,0 +1,31 @@
+Max pattern size = 100
+
+Sequence: chromosome 1
+experiment: tr-6
+number of lines:  1145937
+Total tr lens :  12794178
+coverage = 5.139123504916053 %
+
+Sequence: chromosome 2
+experiment: tr-6
+number of lines:  1243223
+Total tr lens :  13882506
+coverage = 5.731988817917592 %
+
+Sequence: chromosome 3
+experiment: tr-6
+number of lines:  983332
+Total tr lens :  10861543
+coverage = 5.477451464255939 %
+
+Sequence: chromosome 4
+experiment: tr-6
+number of lines:  947172
+Total tr lens :  10569282
+coverage = 5.556505389400932 %
+
+Sequence: chromosome 5
+experiment: tr-6
+number of lines:  895858
+Total tr lens :  9957166
+coverage = 5.4848856956373035 %
