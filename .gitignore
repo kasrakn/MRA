@@ -1,11 +1,26 @@
+### Build artifacts ###
+src/*.o
+src/*.d
+MRA
+
+### Editor swap files ###
+*.swp
+*.swo
+
+### Legacy source ###
+src-old/
+
+### Papers / large binaries ###
+*.pdf
+
 ### Python ###
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
 # C extensions
 *.so
+
 # Environments
 .env
 .venv
