@@ -106,8 +106,8 @@ If you use MRA in your research, please cite:
 @misc{naghibzadeh2023mra,
   title        = {A Novel Multi-head Algorithm to Discover all Tandem Repeats
                  in One Scan of {DNA} Sequences},
-  author       = {Naghibzadeh, Mahmoud and Korminejad, Kasra and
-                 Krishnan, Vandhana and Bahmani, Amir},
+  author       = {Mahmoud Naghibzadeh, Kasra Korminejad,
+                 Vandhana Krishnan, Amir Bahmani},
   year         = {2023},
   doi          = {10.21203/rs.3.rs-2879921/v1},
   url          = {https://doi.org/10.21203/rs.3.rs-2879921/v1},
